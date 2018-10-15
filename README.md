@@ -50,6 +50,14 @@ app.config['MYSQL_DB'] = 'flaskapp'
 mysql = MySQL(app)
 ```
 
+## Port ändern
+
+Standardmäßig hört Flask auf Port 5000.
+
+```python
+if __name__ == '__main__':
+    app.run(debug=True, port=8080)
+```
 
 ## Dummy Student erstellen
 
@@ -109,6 +117,20 @@ def student(id):
         mysql.connection.commit()
         cur.close()
         return "Student Deleted"
+```
+
+PATCH a student
+
+```python
+elif request.method == 'PATCH':
+        req = request.json
+        keys = req.keys()
+        attribute = keys[0]
+        val = "'" + req[attribute] + "'"
+        cur.execute("UPDATE students SET " + attribute + "= " + val + " WHERE id="+ id)
+        mysql.connection.commit()
+        cur.close()
+        return "Student updated"
 ```
 
 
