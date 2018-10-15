@@ -30,7 +30,7 @@ def students():
     rv = cur.fetchall()
     return str(rv)
 
-@app.route('/students/<string:id>/', methods=['GET', 'DELETE'])
+@app.route('/students/<string:id>/', methods=['GET', 'DELETE', 'PATCH'])
 def student(id):
     cur = mysql.connection.cursor()
     if request.method == 'DELETE':
@@ -40,10 +40,21 @@ def student(id):
 
         return "Student Deleted"
 
-    cur.execute('''SELECT * FROM students WHERE id=''' + id)
-    rv = cur.fetchall()
-    return str(rv)
+    elif request.method == 'PATCH':
+        req = request.json
+        keys = req.keys()
+        attribute = keys[0]
+        val = "'" + req[attribute] + "'"
+        cur.execute("UPDATE students SET " + attribute + "= " + val + " WHERE id="+ id)
+        mysql.connection.commit()
+        cur.close()
+        return "Student updated"
+
+    if request.method == 'GET':
+        cur.execute('''SELECT * FROM students WHERE id=''' + id)
+        rv = cur.fetchall()
+        return str(rv)
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
