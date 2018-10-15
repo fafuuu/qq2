@@ -109,7 +109,7 @@ def student(id):
 DELETE a student
 
 ```python
-@app.route('/students/<string:id>/', methods=['GET', 'DELETE'])
+@app.route('/students/<string:id>', methods=['GET', 'DELETE'])
 def student(id):
     cur = mysql.connection.cursor()
     if request.method == 'DELETE':

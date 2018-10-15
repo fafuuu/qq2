@@ -15,8 +15,8 @@ mysql = MySQL(app)
 def students():
     if request.method == 'POST':
         req = request.json
-        vorname = req['first_name']
-        nachname = req['last_name']
+        vorname = req['firstname']
+        nachname = req['lastname']
         matrikelnummer = req['matriculation_number']
         studiengang = req['course']
         email = req['email']
@@ -30,7 +30,7 @@ def students():
     rv = cur.fetchall()
     return str(rv)
 
-@app.route('/students/<string:id>/', methods=['GET', 'DELETE', 'PATCH'])
+@app.route('/students/<string:id>', methods=['GET', 'DELETE', 'PATCH'])
 def student(id):
     cur = mysql.connection.cursor()
     if request.method == 'DELETE':
