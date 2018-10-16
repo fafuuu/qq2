@@ -1,5 +1,7 @@
 # QQ2 Dokumenation
 Hier ist die Vorgehensweise der Bearbeitung des QQ2 Projektes dokumentiert.
+
+**Wichtig damit die Dummy Daten geladen werden
 ## Installation
 
 Python ist standardmäßig auf Ubuntu installiert
@@ -64,6 +66,9 @@ if __name__ == '__main__':
 ```sql
 INSERT INTO students(vorname, nachname, matrikelnummer, studiengang, semester, email) VALUES ("Max", "Mustermann", 12345678, "Medieninformatik", 5, "max@mustermann.edu");
 ```
+
+## Dummy Daten für Programmstart
+
 
 ## Routen
 
@@ -133,5 +138,52 @@ elif request.method == 'PATCH':
         return "Student updated"
 ```
 
+## Logging
 
+Kafka für Flask:
+
+```python
+pip install flask-kafka
+```
+
+Kafka einrichten:
+
+
+```python
+# kafka importieren
+from kafka import SimpleProducer, KafkaClient
+
+# Konfigurieren
+kafka = KafkaClient('qq2.ddnss.de:9092')
+producer = SimpleProducer(kafka)
+topic = 'logging'
+
+```
+
+
+Nachricht senden, wenn eine Aktion ausgeführt wurde
+
+
+```python
+# GET au /student
+producer.send_messages(topic, '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}')
+
+```
+
+Message die gesendet werden soll:
+
+
+```python
+fabian@ThinkPad-X220:~/qq2/qq2$ python
+Python 2.7.12 (default, Dec  4 2017, 14:50:18) 
+[GCC 5.4.0 20160609] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> print '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}'
+{
+"service_name": "1_Flask_1",
+ "operation": "GET",
+ "message": "Liste aller Studenten"
+}
+
+```
 

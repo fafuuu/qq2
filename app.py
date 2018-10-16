@@ -1,5 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.errors import KafkaError
+from kafka import SimpleProducer, KafkaClient
+
 
 app = Flask(__name__)
 
@@ -10,6 +14,14 @@ app.config['MYSQL_DB'] = 'flaskapp'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
+
+kafka = KafkaClient('qq2.ddnss.de:9092')
+producer = SimpleProducer(kafka)
+topic = 'logging'
+#consumer = KafkaConsumer('my-topic', group_id='my-group', bootstrap_servers=['localhost:9092'])
+#KafkaConsumer(auto_offset_reset='earliest', enable_auto_commit=False)
+
+#producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 @app.route('/students', methods=['GET', 'POST'])
 def students():
@@ -22,11 +34,15 @@ def students():
         email = req['email']
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO students(vorname, nachname, matrikelnummer, studiengang, email) VALUES (%s, %s, %s, %s, %s)", (vorname, nachname, matrikelnummer, studiengang, email))
+        print '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}'
         mysql.connection.commit()
         cur.close()
+        #producer.send_messages(topic, '{"service_name": "1_Flask_1", "operation": "POST", "Message": "Neuer Student erstellt"}')
+        producer.send_messages(topic, '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}')
 
     cur = mysql.connection.cursor()
     cur.execute('''SELECT * FROM students''')
+    producer.send_messages(topic, '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}')
     rv = cur.fetchall()
     return str(rv)
 
@@ -53,6 +69,7 @@ def student(id):
     if request.method == 'GET':
         cur.execute('''SELECT * FROM students WHERE id=''' + id)
         rv = cur.fetchall()
+        producer.send_messages(topic, '{"service_name": "1_Flask_1", "operation": "GET", "Message": Einzelner Student"}')
         return str(rv)
     
 
