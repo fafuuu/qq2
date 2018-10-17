@@ -165,7 +165,7 @@ Nachricht senden, wenn eine Aktion ausgeführt wurde
 
 
 ```python
-# GET au /student
+# GET auf /students
 producer.send_messages(topic, '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}')
 
 ```
