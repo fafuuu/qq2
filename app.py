@@ -51,10 +51,17 @@ def student(id):
 
     elif request.method == 'PATCH':
         req = request.json
-        keys = req.keys()
-        attribute = keys[0]
-        val = "'" + req[attribute] + "'"
-        cur.execute("UPDATE students SET " + attribute + "= " + val + " WHERE id="+ id)
+        # OLD PATCH
+        #keys = req.keys()
+        #attribute = keys[0]
+        #val = "'" + req[attribute] + "'"
+        #cur.execute("UPDATE students SET " + attribute + "= " + val + " WHERE id="+ id)
+        vorname = req['firstname']
+        nachname = req['lastname']
+        matrikelnummer = req['matriculation_number']
+        studiengang = req['course']
+        email = req['email']
+        cur.execute("UPDATE students SET vorname=%s, nachname=%s, matrikelnummer=%s,studiengang=%s, email=%s WHERE id=" +id, (vorname, nachname, matrikelnummer, studiengang, email) )
         mysql.connection.commit()
         cur.close()
         producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "PATCH",\n  "message": "Student aktualisiert"\n}')
