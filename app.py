@@ -5,6 +5,7 @@ from kafka.errors import KafkaError
 
 app = Flask(__name__)
 
+
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
@@ -15,6 +16,13 @@ mysql = MySQL(app)
 
 topic = 'logging'
 producer = KafkaProducer(bootstrap_servers=['qq2.ddnss.de:9092'])
+
+@app.before_first_request
+def _run_on_start():
+    cur = mysql.connection.cursor()
+    cur.execute('INSERT INTO students(vorname, nachname, matrikelnummer, studiengang, email) VALUES ("John", "Doe", 12345678, "Mi", "john@doe.com")')
+    mysql.connection.commit()
+    cur.close()
 
 @app.route('/students', methods=['GET', 'POST'])
 def students():
@@ -72,6 +80,7 @@ def student(id):
         rv = cur.fetchall()
         producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "GET",\n  "message": "Einzelner Student"\n}')
         return str(rv)
-    
+        
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
+    
