@@ -151,13 +151,12 @@ Kafka einrichten:
 
 ```python
 # kafka importieren
-from kafka import SimpleProducer, KafkaClient
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.errors import KafkaError
 
 # Konfigurieren
-kafka = KafkaClient('qq2.ddnss.de:9092')
-producer = SimpleProducer(kafka)
 topic = 'logging'
-
+producer = KafkaProducer(bootstrap_servers=['qq2.ddnss.de:9092'])
 ```
 
 
@@ -166,8 +165,19 @@ Nachricht senden, wenn eine Aktion ausgeführt wurde
 
 ```python
 # GET auf /students
-producer.send_messages(topic, '{\n"service_name": "1_Flask_1",\n "operation": "GET",\n "message": "Liste aller Studenten"\n}')
+producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "GET",\n  "message": "Liste aller Studenten"\n}')
 
+# POST auf /students
+producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "POST",\n  "message": "Neuer Student angelegt"\n}')
+        
+# DELETE /student/{id}
+producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "DELETE",\n  "message": "Student geloescht"\n}')
+   
+# GET /student/{id}
+producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "GET",\n  "message": "Einzelner Student"\n}')
+
+# PATCH /student/{id}
+producer.send(topic, '{\n  "service_name": "1_Flask_1",\n  "operation": "PATCH",\n  "message": "Student aktualisiert"\n}')        
 ```
 
 Message die gesendet werden soll:
